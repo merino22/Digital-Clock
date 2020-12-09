@@ -5,15 +5,21 @@ module Clock
     output reg[3:0] rightSec_cs,
     output reg[2:0] leftSec_cs,
     output reg[3:0] rightMin_cs,
-    output reg [2:0] leftMin_cs
+    output reg[2:0] leftMin_cs,
+    output reg[3:0] rightHr_cs,
+    output reg[1:0] leftHr_cs
 );
 
     reg sigMin;
     reg[3:0] rightSec_ns;
     reg[2:0] leftSec_ns;
 
+    reg sigHr;
     reg[3:0] rightMin_ns;
     reg[2:0] leftMin_ns;
+
+    reg[3:0] rightHr_ns;
+    reg[1:0] leftHr_ns;
 
     always @(posedge clk)
     begin
@@ -27,11 +33,18 @@ module Clock
             rightMin_ns <= 4'b0000;
             leftMin_cs <= 3'b000;
             leftMin_ns <= 3'b000;
+            sigHr <= 1'b0;
+            rightHr_cs <= 4'b0000;
+            rightHr_ns <= 4'b0000;
+            leftHr_cs <= 2'b00;
+            leftHr_ns <= 2'b00;
         end else
             rightSec_cs <= rightSec_ns;
             leftSec_cs <= leftSec_ns;
             rightMin_cs <= rightMin_ns;
             leftMin_cs <= leftMin_ns;
+            rightHr_cs <= rightHr_ns;
+            leftHr_cs <= leftHr_ns;
     end
 
     // Set next state for Right Seconds
@@ -40,6 +53,7 @@ module Clock
         case(rightSec_cs)
             4'd0: begin
                sigMin = 1'b0;
+               sigHr = 1'b0;
                rightSec_ns = 4'd1; 
             end
                 
@@ -88,8 +102,9 @@ module Clock
     begin
         if(sigMin) begin
             case(rightMin_cs)
-                4'd0:
+                4'd0: begin
                     rightMin_ns = 4'd1;
+                end
                 4'd1:
                     rightMin_ns = 4'd2;
                 4'd2:
@@ -120,8 +135,48 @@ module Clock
                             leftMin_ns = 4'd4;
                         4'd4:
                             leftMin_ns = 4'd5;
-                        4'd5:
+                        4'd5: begin
                             leftMin_ns = 4'd0;
+                            sigHr = 1'b1;
+                        end
+                    endcase
+                end
+            endcase
+        end
+    end
+
+    always @(*)
+    begin
+        if(sigHr) begin
+            case(rightHr_cs)
+                4'd0:
+                    rightHr_ns = 4'd1;
+                4'd1:
+                    rightHr_ns = 4'd2;
+                4'd2:
+                    rightHr_ns = 4'd3;
+                4'd3:
+                    rightHr_ns = 4'd4;
+                4'd4:
+                    rightHr_ns = 4'd5;
+                4'd5:
+                    rightHr_ns = 4'd6;
+                4'd6:
+                    rightHr_ns = 4'd7;
+                4'd7:
+                    rightHr_ns = 4'd8;
+                4'd8:
+                    rightHr_ns = 4'd9;
+                4'd9: begin
+                    rightHr_ns = 4'd0;
+
+                    case(leftHr_cs)
+                        4'd0:
+                            leftHr_ns = 4'd1;
+                        4'd1:
+                            leftHr_ns = 4'd2;
+                        4'd2:
+                            leftHr_ns = 4'd0;
                     endcase
                 end
             endcase
