@@ -3,6 +3,13 @@ module ControllerMinutes
     input clk,
     input [3:0] rightMin,
     input [2:0] leftMin,
+    input [3:0] setRMin,
+    input [2:0] setLMin,
+    input setSignal,
+    input alarmSignal,
+    input setLMSignal,
+    input setRMSignal,
+    input clk2,
     output reg [3:0] RM,
     output reg RP,
     output reg [3:0] LM,
@@ -12,11 +19,31 @@ module ControllerMinutes
     reg [3:0] rightMin_s;
     reg [2:0] leftMin_s;
 
-    //Clock for Minutes
+    //Second clk used for setting states when setSignal or alarmSignal is on
+    always @(posedge clk2)
+    begin
+	if(setSignal) begin
+        if(alarmSignal == 0) begin
+            if(setLMSignal)
+                leftMin_s <= setLMin;
+            else if(setRMSignal)
+                rightMin_s <= setRMin; 
+        end
+    end else begin
+        if(alarmSignal) begin
+            if(setLMSignal)
+                leftMin_s <= setLMin;
+            else if(setRMSignal)
+                rightMin_s <= setRMin; 
+        end
+    end
+    end
+
+    // Set state of left and right minute digits
     always @(posedge clk)
     begin
-        rightMin_s <= rightMin;
-        leftMin_s <= leftMin;
+	    rightMin_s <= rightMin;
+        leftMin_s <= leftMin;   
     end
 
     // Set LED for Right Minutes
@@ -97,4 +124,3 @@ module ControllerMinutes
         endcase
     end
 endmodule
-

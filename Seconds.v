@@ -12,12 +12,14 @@ module ControllerSeconds
     reg[2:0] leftSecs_s;
     reg[3:0] rightSecs_s;
 
+    // Set state for left and right second digits
     always @(posedge clk)
     begin
         leftSecs_s <= leftSecs;
         rightSecs_s <= rightSecs;
     end
 
+    // Set LED states for right second digit
     always @(*)
     begin
         case(rightSecs_s)
@@ -64,6 +66,7 @@ module ControllerSeconds
         endcase
     end
 
+    // Set LED state for left second digit
     always @(*)
     begin
         case(leftSecs_s)

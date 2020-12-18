@@ -3,21 +3,51 @@ module ControllerHours
     input clk,
     input[3:0] rightHr,
     input[1:0] leftHr,
+    input setSignal,
+    input alarmSignal,
+    input setLHSignal,
+    input setRHSignal,
+    input [1:0]setLHr,
+    input [3:0]setRHr,
+    input clk2,
     output reg[3:0] RH,
     output reg RPH,
     output reg[3:0] LH,
     output reg LPH
 );
 
+    //Registers for right hour and left hour digits
     reg[3:0] rightHr_s;
     reg[1:0] leftHr_s;
 
+    // Set state of left and right hour digits to the state being inputted from Clock
     always @(posedge clk)
     begin
-       rightHr_s <= rightHr;
-       leftHr_s <= leftHr; 
+	    rightHr_s <= rightHr;
+        leftHr_s <= leftHr;
     end
 
+    // Second clk which sets left and right hour digits to state being inputted from ControllerSetNumberOutput 
+    always @(posedge clk2)
+    begin
+       if(setSignal) begin //Setting of digits if setSignal is on and alarmSignal is off
+           if(alarmSignal == 0) begin
+                if(setLHSignal) 
+                    leftHr_s <= setLHr;
+                else if(setRHSignal)
+                    rightHr_s <= setRHr;
+           end
+       end else begin
+           if(alarmSignal) begin // Setting of digits if setSignal is off and alarmSignal is on
+               if(setLHSignal)
+                    leftHr_s <= setLHr;
+                else if(setRHSignal)
+                    rightHr_s <= setRHr;
+           end
+       end
+    end
+
+    // Set right hour digit value for LED Number display
     always @(*)
     begin
         case(rightHr_s)
@@ -64,6 +94,7 @@ module ControllerHours
         endcase
     end
 
+    // Set left hour digit value for LED Number display
     always @(*)
     begin
         case(leftHr_s)
@@ -86,4 +117,3 @@ module ControllerHours
         endcase
     end     
 endmodule
-        
