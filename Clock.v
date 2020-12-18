@@ -23,23 +23,28 @@ module Clock
     output reg[3:0] ArightMin_o
 );
 
+    // Registers for right and left second digits
     reg sigMin;
     reg[3:0] rightSec_ns;
     reg[2:0] leftSec_ns;
 
+    //Registers for right and left minute digits
     reg sigTwoFour;
     reg sigHr;
     reg[3:0] rightMin_ns;
     reg[2:0] leftMin_ns;
 
+    // Registers for right anf left hour digits
     reg[3:0] rightHr_ns;
     reg[1:0] leftHr_ns;
 
+    // Registers for hour and minute digits of alarm 
     reg[1:0] ALeftHr;
     reg[3:0] ARightHr;
     reg[2:0] ALeftMin;
     reg[3:0] ARightMin;
 
+    // Registers for counter of alarm ON/OFF time
     reg[31:0] counter;
     reg[31:0] counter_next;
 
@@ -83,6 +88,9 @@ module Clock
         if(setSignal) begin
             if(alarmSignal == 0) begin
                 leftHr_ns <= setLH;
+                if(setLH == 2) begin
+                    sigTwoFour = 1'b1;
+                end
                 rightHr_ns <= setRH;
                 leftMin_ns <= setLM;
                 rightMin_ns <= setRM;
@@ -101,7 +109,7 @@ module Clock
         end
     end
 
-    //If alarm switch is On then set alarmClk to 1 for blinking effect
+    //If alarm states match current states then activate alarm
     always @(*) begin
         if(almON) begin
             if(leftHr_cs == ALeftHr) begin
@@ -112,6 +120,9 @@ module Clock
                     end
                 end
             end
+        end else begin
+            alarmClk <= 1'b0;
+            counter <= 32'd10;
         end
     end
 
@@ -125,7 +136,7 @@ module Clock
         if(alarmClk) begin
             counter_next = counter + 1;
         end
-        if(counter == 32'd35000) //If counter reaches aprox 10 seconds alarm is turned off
+        if(counter == 32'd300) //If counter reaches aprox 10 seconds alarm is turned off
             alarmClk = 1'b0;
             counter = 32'd0;
     end
