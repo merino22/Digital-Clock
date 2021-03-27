@@ -1,6 +1,6 @@
 # Digital-Clock
 ## Tools
-Digital Clock developed using Hardware Description Language (Verilog - Icarus Verilog http://iverilog.icarus.com/) & digital logic designer (Digital by hneemann https://github.com/hneemann/Digital).
+Digital Clock developed using Hardware Description Language (Verilog - Icarus Verilog http://iverilog.icarus.com/) & Digital Logic Designer (Digital by hneemann https://github.com/hneemann/Digital).
 
 ## Functionality
 Displays seconds, minutes, hours and implements alarm feature. Includes number keypad and switches for hour-setting and alarm-setting features.
